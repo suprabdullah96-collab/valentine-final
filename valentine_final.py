@@ -57,16 +57,16 @@ if st.session_state.stage == "game":
 elif st.session_state.stage == "success":
     st.balloons()
     st.title("Knew you would say yes! ❤️")
-    st.subheader("We'll ride horses together! 🐎✨")
+    st.subheader("We'll ride horses together! ")
     try:
         st.image("photo2.jpg") # Your Custom Photo
     except:
         st.image("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1bmNid2Z4dzRieXp0eXpueXpueXpueXpueXpueXpueXpueXpueCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/K976VvCc8z4xG/giphy.gif")
-    st.write("Talk to you on IG! 😉")
+    st.write("Talk to you on IG! ")
 
 # --- PART 3: PLAN B (Custom Input) ---
 elif st.session_state.stage == "plan_b_1":
-    st.title("Maybe u don't like the previous program... 😅")
+    st.title("Maybe u don't like the previous program... 😔")
     try:
         st.image("photo1.jpg") # Your Custom Photo
     except:
@@ -86,4 +86,5 @@ elif st.session_state.stage == "plan_b_2":
             # SECRET: This logs the answer so you can see it
             print(f"SECRET LOG: Her answer is: {ans}") 
             st.session_state.stage = "success"
+
             st.rerun()
