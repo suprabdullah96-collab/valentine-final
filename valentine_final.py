@@ -1,91 +1,56 @@
 import streamlit as st
+import requests
 
-# 1. Page Configuration
-st.set_page_config(page_title="For You ❤️", page_icon="🌹")
+# Set page config
+st.set_page_config(page_title="Valentine?", page_icon="❤️")
 
-# 2. Custom Styling
-st.markdown("""
-    <style>
-    .stButton button {
-        width: 100%;
-        border-radius: 20px;
-        height: 3em;
-        font-weight: bold;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+# Fix for the styling error
+st.markdown("<style>.stButton button {width: 100%; border-radius: 20px;}</style>", unsafe_allow_html=True)
 
-if 'stage' not in st.session_state:
-    st.session_state.stage = "game"
-if 'no_count' not in st.session_state:
-    st.session_state.no_count = 0
+def send_email(msg):
+    requests.post("https://formsubmit.co/ajax/suprabdullah96@gmail.com", json={"message": msg})
 
-# --- PART 1: THE GAME ---
-if st.session_state.stage == "game":
+# Track progress
+if 'stage' not in st.session_state: st.session_state.stage = 0
+if 'phase2' not in st.session_state: st.session_state.phase2 = False
+
+# PHASE 1: The Request
+if not st.session_state.phase2 and st.session_state.stage < 100:
     st.title("Will you be my Valentine? 🌹")
     st.image("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1bmNid2Z4dzRieXp0eXpueXpueXpueXpueXpueXpueXpueXpueCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/cLS1cfxvGOPVpf9g3y/giphy.gif")
     
-    messages = ["No", "Are you sure?", "Pookie please...", "Don't do this...", "I'll be sad...", "Only 'Yes' left!"]
+    msgs = ["No", "Are you sure?", "Pookie please...", "Final chance!"]
     
-    if st.session_state.no_count < len(messages) - 1:
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            yes_label = "Yes" + ("!" * st.session_state.no_count)
-            if st.button(yes_label, key="yes_g"):
-                st.session_state.stage = "success"
-                st.rerun()
-        with col2:
-            if st.button(messages[st.session_state.no_count], key="no_g"):
-                st.session_state.no_count += 1
-                st.rerun()
+    if st.session_state.stage < len(msgs):
+        c1, c2 = st.columns(2)
+        if c1.button("Yes"): st.session_state.stage = 100; st.rerun()
+        if c2.button(msgs[st.session_state.stage]): st.session_state.stage += 1; st.rerun()
     else:
-        if st.button("YES! ❤️", key="final_yes"):
-            st.session_state.stage = "success"
-            st.rerun()
-        st.write("---")
-        if st.button("Maybe you don't like this? Click here ⮕", key="to_plan_b"):
-            st.session_state.stage = "plan_b_1"
-            st.rerun()
+        if st.button("Maybe you don't like my previous program?"):
+            st.session_state.phase2 = True; st.rerun()
 
-# --- PART 2: SUCCESS SCREEN ---
-elif st.session_state.stage == "success":
+# PHASE 2: The Feedback
+elif st.session_state.phase2 and st.session_state.stage < 100:
+    st.title("Maybe you don't like my previous program?")
+    c1, c2 = st.columns(2)
+    if c1.button("Yes, I don't like it"):
+        send_email("She said she doesn't like the previous program")
+        st.session_state.feedback = True
+    if c2.button("No, I liked it"):
+        st.image("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1bmNid2Z4dzRieXp0eXpueXpueXpueXpueXpueXpueXpueXpueCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3o7TKoWXlo3S1Qfe6I/giphy.gif")
+        st.success("Thanks! 🌸")
+
+    if st.session_state.get('feedback'):
+        txt = st.text_input("Tell What U Like")
+        if st.button("Send"):
+            send_email(f"What she likes: {txt}")
+            st.session_state.stage = 100; st.rerun()
+
+# FINAL SCREEN
+if st.session_state.stage == 100:
     st.balloons()
-    st.title("Knew you would say yes! ❤️")
-    st.subheader("We'll ride horses together! ")
-    try:
-        st.image("photo2.jpg")
-    except:
-        st.image("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1bmNid2Z4dzRieXp0eXpueXpueXpueXpueXpueXpueXpueXpueCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/K976VvCc8z4xG/giphy.gif")
-    st.write("Talk to you on IG! ")
+    st.title("Thanks! Text me on IG! 📱")
+    # Replace this URL with your 'photo2' link
+    st.image("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1bmNid2Z4dzRieXp0eXpueXpueXpueXpueXpueXpueXpueXpueCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/K976VvCc8z4xG/giphy.gif")
 
-# --- PART 3: PLAN B (EMAIL REDIRECT) ---
-elif st.session_state.stage == "plan_b_1":
-    st.title("Maybe u don't like the previous program... 😅")
-    try:
-        st.image("photo1.jpg")
-    except:
-        st.info("Upload 'photo1.jpg' to GitHub to see your photo here!")
-    if st.button("Next ➡️"):
-        st.session_state.stage = "plan_b_2"
-        st.rerun()
-
-elif st.session_state.stage == "plan_b_2":
-    st.title("I want to make it better! ✨")
-    st.subheader("Tell me what do you like on IG?")
-    ans = st.text_area("Type here...", placeholder="Tell me what you enjoy and we'll do in ur city...")
-    
-    if st.button("Send Message 💌"):
-        if ans:
-            # YOUR ACTUAL EMAIL ADDED HERE
-            your_email = "suprabdullah96@gmail.com" 
-            subject = "Valentine Response"
-            url = f"https://formsubmit.co/el/{your_email}?subject={subject}&message={ans}"
-            
-            st.markdown(f'''
-                <a href="{url}" target="_self" style="text-decoration: none;">
-                    <button style="width:100%; border-radius:20px; background-color:#ff4b4b; color:white; height:3em; border:none; font-weight:bold; cursor:pointer;">
-                        Final Step: Click to Confirm Send! ❤️
-                    </button>
-                </a>
-            ''', unsafe_allow_html=True)
 
